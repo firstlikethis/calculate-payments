@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css">
 
     <style>
-     body {
+        body {
             font-family: Arial, sans-serif;
             padding: 20px;
             display: flex;
@@ -39,35 +38,72 @@
         th {
             background-color: #f2f2f2;
         }
-        
     </style>
 </head>
 
 <body>
     <div class="container">
         <h1>คำนวณค่าผ่อนชำระ</h1>
-        <label for="loanAmount" class="form-label">ยอดเงินทั้งหมด (฿): </label>
-        <input type="number" id="loanAmount" step="1000" placeholder="กรอกยอดเงินทั้งหมด" class="form-control"><br><br>
+        <div class="row">
+            <div class="col-lg-6">
+                <label for="loanAmount" class="form-label">เงินต้นคงเหลือ (฿): </label>
+                <input type="number" id="loanAmountInput" step="1000" placeholder="กรอกยอดเงินต้น"
+                    class="form-control"><br><br>
+            </div>
 
-        <label for="annualInterestRate" class="form-label">อัตราดอกเบี้ยต่อปี (%): </label>
-        <input type="number" id="annualInterestRate" step="0.1" placeholder="กรอกอัตราดอกเบี้ยต่อปี" class="form-control"><br><br>
-
-        <label for="birthdate" class="form-label">วันเดือนปีเกิด: </label>
-        <input type="date" id="birthdate" class="form-control"><br><br>
+            <div class="col-lg-6">
+                <label for="interestAmount" class="form-label">ดอกเบี้ย (฿): </label>
+                <input type="number" id="interestAmountInput" step="1000" placeholder="กรอกยอดดอกเบี้ย"
+                    class="form-control"><br><br>
+            </div>
+            <div class="col-lg-6">
+                <label for="courtFeeAmount" class="form-label">ค่าธรรมเนียบมศาล (฿): </label>
+                <input type="number" id="courtFeeAmountInput" step="1000" placeholder="กรอกยอดค่าธรรมเนียบมศาล"
+                    class="form-control"><br><br>
+            </div>
+            <div class="col-lg-6">
+                <label for="lawyerFeeAmount" class="form-label">ค่าทนายความ (฿): </label>
+                <input type="number" id="lawyerFeeAmountInput" step="1000" placeholder="กรอกยอดค่าทนายความ"
+                    class="form-control"><br><br>
+            </div>
+            <div class="col-lg-6">
+                <label for="legalExpenseAmount" class="form-label">ค่าใช้จ่ายในการดำเนินคดี (฿): </label>
+                <input type="number" id="legalExpenseAmountInput" step="1000"
+                    placeholder="กรอกยอดค่าใช้จ่ายในการดำเนินคดี" class="form-control"><br><br>
+            </div>
+            <div class="col-lg-6">
+                <label for="annualInterestRate" class="form-label">อัตราดอกเบี้ยต่อปี (%): </label>
+                <input type="number" id="annualInterestRateInput" step="0.1" placeholder="กรอกอัตราดอกเบี้ยต่อปี"
+                    class="form-control"><br><br>
+            </div>
+            <div class="col-lg-6">
+                <label for="birthdate" class="form-label">วันเดือนปีเกิด: </label>
+                <input type="date" id="birthdateInput" class="form-control"><br><br>
+            </div>
+        </div>
 
         <div id="result-info">
+            อายุ: <span id="ageText"></span>
+            <br>
             ระยะเวลาในการผ่อนชำระ (ปี) : <span id="loanTermInYearsText"></span>
             ปี (งวด) : <span id="loanTermInMonthsText"></span> งวด
+        </div>
+
+        <div id="monthlyPaymentAmount">
+            ยอดรวมทั้งหมด: <span id="totalAmountText"></span> บาท
             <br>
-            อายุ: <span id="ageText"></span>
+            <!-- ดอกเบี้ยรวมทั้งหมด: <span id="totalInterestText"></span> บาท
+            <br> -->
+            จำนวนเงินต่องวดที่ต้องชำระ: <span id="monthlyPaymentAmountText"></span> บาท
         </div>
 
         <br>
-        <button onclick="calculateMonthlyPayment()" class="btn btn-primary">คำนวณค่าผ่อนชำระเดือนละเท่าไหร่</button><br><br>
-        <a class="btn btn-secondary" href="./tb2.html">ตารางคล้ายๆ DMS</a><br><br>
+        <button onclick="calculateMonthlyPayment()"
+            class="btn btn-primary">คำนวณค่าผ่อนชำระเดือนละเท่าไหร่</button><br><br>
+        <!-- <a class="btn btn-secondary" href="./tb2.html">ตารางคล้ายๆ DMS</a><br><br> -->
 
     </div>
-    
+
     <div id="result-table"></div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -75,92 +111,55 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        function getThaiMonth(month) {
-            const thaiMonths = [
-                'มกราคม', 'กุมภาพันธ์', 'มีนาคม',
-                'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-                'กรกฎาคม', 'สิงหาคม', 'กันยายน',
-                'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-            ];
+        function calculateTotalAmount() {
+            const loanAmount = parseFloat(document.getElementById('loanAmountInput').value) || 0;
+            const interestAmount = parseFloat(document.getElementById('interestAmountInput').value) || 0;
+            const courtFeeAmount = parseFloat(document.getElementById('courtFeeAmountInput').value) || 0;
+            const lawyerFeeAmount = parseFloat(document.getElementById('lawyerFeeAmountInput').value) || 0;
+            const legalExpenseAmount = parseFloat(document.getElementById('legalExpenseAmountInput').value) || 0;
 
-            return thaiMonths[month];
+            const totalAmount = loanAmount + interestAmount + courtFeeAmount + lawyerFeeAmount + legalExpenseAmount;
+
+            document.getElementById('totalAmountText').innerText = `${totalAmount.toFixed(2)}`;
         }
 
         function calculateMonthlyPayment() {
-            const loanAmount = parseFloat(document.getElementById('loanAmount').value);
-            const annualInterestRate = parseFloat(document.getElementById('annualInterestRate').value);
-
-            const birthdate = new Date(document.getElementById('birthdate').value);
+            calculateTotalAmount();
+            const loanAmount = parseFloat(document.getElementById('loanAmountInput').value) || 0;
+            const annualInterestRate = parseFloat(document.getElementById('annualInterestRateInput').value) || 0;
+            const birthdate = new Date(document.getElementById('birthdateInput').value);
             const today = new Date();
 
             const age = today.getFullYear() - birthdate.getFullYear();
             const monthDifference = today.getMonth() - birthdate.getMonth();
             const monthRemainder = (today.getDate() < birthdate.getDate()) ? 1 : 0;
 
-            let ageText = '';
-            if (monthDifference < 0 || (monthDifference === 0 && monthRemainder === 0)) {
-                ageText = `${age} ปี`;
-            } else {
-                ageText = `${age} ปี ${monthDifference} เดือน`;
+            let ageText = `${age} ปี`;
+            if (monthDifference > 0 || (monthDifference === 0 && monthRemainder > 0)) {
+                ageText += ` ${monthDifference} เดือน`;
             }
 
             document.getElementById('ageText').innerText = ageText;
+
             let maxLoanTerm = 15;
             if (age >= 65) {
                 maxLoanTerm = 0;
             } else {
                 maxLoanTerm = Math.min(maxLoanTerm, 65 - age);
             }
-            const actualLoanTerm = maxLoanTerm;
 
+            const actualLoanTerm = maxLoanTerm;
             const monthlyInterestRate = annualInterestRate / 12 / 100;
             const numberOfMonths = actualLoanTerm * 12;
             const monthlyPayment = (loanAmount * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -numberOfMonths));
-            const loanTermInYears = actualLoanTerm;
-            const loanTermInMonths = actualLoanTerm * 12;
 
-            document.getElementById('loanTermInYearsText').innerText = loanTermInYears;
-            document.getElementById('loanTermInMonthsText').innerText = loanTermInMonths;
-            document.getElementById('ageText').innerText = ageText;
-            const resultDiv = document.getElementById('result-table');
-            resultDiv.innerHTML = '';
+            document.getElementById('loanTermInYearsText').innerText = actualLoanTerm;
+            document.getElementById('loanTermInMonthsText').innerText = actualLoanTerm * 12;
 
-            const table = document.createElement('table');
-            table.innerHTML = '<tr><th>งวดที่</th><th>วันที่ครบกำหนด</th><th>ค่าผ่อนชำระ</th><th>ยอดเงินคงเหลือ</th></tr>';
+            document.getElementById('monthlyPaymentAmountText').innerText = `${monthlyPayment.toFixed(2)}`;
 
-            let remainingBalance = loanAmount;
-            let currentMonth = today.getMonth() + 1;  // เริ่มต้นจากเดือนทำรายการ
-            for (let month = 1; month <= numberOfMonths; month++) {
-                const date = new Date(today.getFullYear(), currentMonth - 1, 5);
-
-
-                // ตรวจสอบว่าวันที่เป็นวันที่กี่ของเดือน
-                const currentDateOfMonth = date.getDate();
-
-                // ปรับวันที่ต้องชำระตามเงื่อนไข
-                if (currentDateOfMonth > 1 && currentDateOfMonth <= 4) {
-                    date.setMonth(date.getMonth(), 5);
-                } else if (currentDateOfMonth === 5) {
-                    date.setMonth(date.getMonth() + 1, 5);
-                } else {
-                    date.setMonth(date.getMonth() + 1, 5);
-                }
-
-                // แสดงผลตาราง
-                const interestPayment = remainingBalance * monthlyInterestRate;
-                const principalPayment = monthlyPayment - interestPayment;
-                const monthlyPaymentAmount = (month === numberOfMonths) ? remainingBalance : principalPayment;
-
-                remainingBalance -= principalPayment;
-                currentMonth += 1;
-
-                const thaiDate = `${date.getDate()} ${getThaiMonth(date.getMonth())} ${date.getFullYear() + 543}`;
-
-                const row = table.insertRow();
-                row.innerHTML = `<td>${month}</td><td>${thaiDate}</td><td>฿${monthlyPaymentAmount.toFixed(2)}</td><td>฿${remainingBalance.toFixed(2)}</td>`;
-            }
-
-            resultDiv.appendChild(table);
+            const totalAmount = monthlyPayment * numberOfMonths;
+            document.getElementById('totalAmountText').innerText = `${totalAmount.toFixed(2)}`;
         }
 
     </script>
